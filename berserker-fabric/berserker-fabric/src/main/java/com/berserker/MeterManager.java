@@ -48,11 +48,15 @@ public final class MeterManager {
 			}
 		});
 
-		ServerLivingEntityEvents.AFTER_DAMAGE.register((entity, source, baseDamageTaken, damageTaken, blocked) -> {
-			if (entity instanceof ServerPlayerEntity player && !blocked && damageTaken > 0) {
-				onHurt(player, damageTaken);
-			}
-		});
+		ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
+    if (entity instanceof ServerPlayerEntity player
+            && amount > 0
+            && !player.isInvulnerableTo(source)
+            && player.timeUntilRegen <= 10) {
+        onHurt(player, amount);
+    }
+    return true;
+});
 
 		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) ->
 				STATES.remove(handler.getPlayer().getUuid()));
